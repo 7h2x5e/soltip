@@ -1,0 +1,86 @@
+.fade-in {
+  opacity: 1;
+  transition: opacity 2s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* container */
+#box {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+/* wrap */
+#wrap {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: table;
+}
+
+#text-wrap, #image-wrap {
+  display: table-row;
+}
+
+#image-wrap {
+  height: '100%';
+  width: '100%';
+}
+
+#text-wrap {
+  z-index: 1;
+  position: relative;
+}
+
+#text, #image {
+  z-index: 1;
+  position: relative;
+}
+
+#text, #image {
+  height: "100%";
+  display: table-cell;
+}
+
+/* alert-image */
+#image {
+  height: 100%;
+  display: table-cell;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/* alert-message */
+#text {
+  padding: 18px;
+  text-shadow: 
+  0px 0px 2px #000, 
+  0px 0px 3px #000, 
+  0px 0px 5px #000, 
+  0px 0px 7px #000, 
+  0px 0px 11px #000;
+}
+
+#message, #user-message {
+  text-align: center;
+}
+
+#message {
+  font-size: 64px;
+  color: rgb(255, 255, 255);
+  font-family: "Open Sans";
+  font-weight: 900;
+}
+
+#user-message {
+  font-weight: 450;
+  font-size: 24px;
+  color: rgb(255, 255, 255);
+  font-family: "Open Sans";
+}
