@@ -20,7 +20,7 @@ A tipping DApp for Solana and OBS Studio users.
 ## Demo
 1. Setting up CLR Browser for OBS. The link is `https://soltip.tw/alertbox/?address=YOUR_WALLET_ADDRESS`. Replace `YOUR_WALLET_ADDRESS` with your SOL address.
 
-2. Open `https://soltip.tw/tip` and connect with your wallet, try to send any token to your `YOUR_WALLET_ADDRESS` or SPL token account with a message. Only the tip with a price above the threshold and accepted tokens will display on alert-box page. The minimal accepted price is **$0.03** and these accepted tokens are **SOL, USDC, RAY** by default.
+2. Open [https://soltip.tw/tip](https://soltip.tw/tip) and connect with your wallet, try to send any token to your `YOUR_WALLET_ADDRESS` or SPL token account with a message. Only the tip with a price above the threshold and accepted tokens will display on alert-box page. The minimal accepted price is **$0.03** and these accepted tokens are **SOL, USDC, RAY** by default.
 
 3. Wait for 10s to see the result. If not, one of the reasons is that the RPC endpoint (mainnet-beta) rejects your request, you should try to build by yourself and then increase `POLLING_INTERVAL`.
 
