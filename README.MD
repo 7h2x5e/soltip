@@ -5,6 +5,7 @@ A tipping DApp for Solana and OBS Studio users.
 </div>
 
 ## Quick Links
+- [Introduction](#introduction)
 - [Feature](#feature)
 - [Demo](#demo)
 - [Build And Setup](#build-and-setup)
@@ -12,17 +13,36 @@ A tipping DApp for Solana and OBS Studio users.
     + [Setup](#setup)
 - [Credits](#credits)
 
+## Introduction
+Solana's first tipping app, SolTip, is a frontend only tipping solution with real-time prices using Pyth API. SolTip provides streamers with an alert box for every donation, allowing for immediate audience engagement. Featuring extremely low transaction fees second only to IOTA, SolTip is fast, accurate, and easy to use.
+
 ## Feature
 - Customized accepted minimal price 
 - Customized token watch list
 - Bad-words Filter
+- Support SNS Domain (`.sol`)
 
 ## Demo
-1. Setting up CLR Browser for OBS. The link is `https://soltip.tw/alertbox/?address=YOUR_WALLET_ADDRESS`. Replace `YOUR_WALLET_ADDRESS` with your SOL address.
+1. Setting up CLR Browser for OBS. The link is `https://soltip.tw/alertbox/?address=ADDRESS`. Replace `ADDRESS` with your SOL address or domain name. For example:
+```
+https://soltip.tw/alertbox/?address=gura.sol
+```
+Or
+```
+https://soltip.tw/alertbox/?address=ARJC7RU7vYcgZ2HPA2dANyD4pcNzQmMaLFKYSKnsAZ6B
+```
 
-2. Open [https://soltip.tw/tip](https://soltip.tw/tip) and connect with your wallet, try to send any token to your `YOUR_WALLET_ADDRESS` or SPL token account with a message. Only the tip with a price above the threshold and accepted tokens will display on alert-box page. The minimal accepted price is **$0.03** and these accepted tokens are **SOL, USDC, RAY** by default.
+2. Tipping someone. Open 
+```
+https://soltip.tw/tip
+```
+Or
+```
+https://soltip.tw/tip?address=ADDRESS
+```
+and connect with your wallet, try to send any token with a message. Only the tip with a price above the threshold and accepted tokens will display on alert-box page. The minimal accepted price is **$0.1** and these accepted tokens are **SOL, USDC, RAY** by default.
 
-3. Wait for 10s to see the result. If not, one of the reasons is that the RPC endpoint (mainnet-beta) rejects your request, you should try to build by yourself and then increase `POLLING_INTERVAL`.
+3. Wait for 10s to see the result. If not, one of the reasons is that the RPC endpoint (`mainnet-beta`) rejects your request, you should try to build by yourself and then increase `POLLING_INTERVAL`.
 
 <p align="center">
   <img width="" src="./demo.gif" alt=""></p>

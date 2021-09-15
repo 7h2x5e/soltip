@@ -20,6 +20,10 @@ import {
 import { useTokenInfos } from './utils/tokens/names';
 import { useSnackbar } from 'notistack';
 import { ViewTransactionOnExplorerButton } from './utils/notifications'
+import { resolveDomainName, resolveTwitterHandle } from './utils/name-service';
+import {
+    useLocation
+} from "react-router-dom";
 
 function balanceAmountToUserAmount(balanceAmount, decimals) {
     return (balanceAmount / Math.pow(10, decimals)).toFixed(decimals);
@@ -28,6 +32,7 @@ function balanceAmountToUserAmount(balanceAmount, decimals) {
 function useForm(publicKeys, lastTxTimestamp) {
     const { connection } = useConnection();
     const [destinationAddress, setDestinationAddress] = useState('');
+    const [recipientAddress, setRecipientAddress] = useState('');
     const [transferAmountString, setTransferAmountString] = useState('');
     const [author, setAuthor] = useState('');
     const [memo, setMemo] = useState('');
@@ -36,7 +41,7 @@ function useForm(publicKeys, lastTxTimestamp) {
     const [tokenList, setTokenList] = useState([]);
     const [balanceInfo, setBalanceInfo] = useState();
     const [selectValue, setSelectValue] = useState();
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
 
     const defaultAddressHelperText =
         !balanceInfo?.mint || balanceInfo?.mint.equals(WRAPPED_SOL_MINT) ?
@@ -66,7 +71,7 @@ function useForm(publicKeys, lastTxTimestamp) {
 
     const updateBalanceInfos = async () => {
         if (!publicKeys) return;
-        let id = enqueueSnackbar('Retrieving account data...', {
+        enqueueSnackbar('Retrieving account data...', {
             variant: 'info',
             autoHideDuration: 1500
         });
@@ -170,14 +175,41 @@ function useForm(publicKeys, lastTxTimestamp) {
     useEffect(() => {
         (async () => {
             const mintString = balanceInfo?.mint && balanceInfo?.mint.toBase58();
-            if (!destinationAddress) {
+            let isDomainName = false, domainOwner;
+            if (recipientAddress.startsWith('@')) {
+                const twitterOwner = await resolveTwitterHandle(
+                    connection,
+                    recipientAddress.slice(1),
+                );
+                if (!twitterOwner) {
+                    setAddressHelperText(`This Twitter handle is not registered`);
+                    setPassValidation(undefined);
+                    return;
+                }
+                isDomainName = true;
+                domainOwner = twitterOwner;
+            }
+            if (recipientAddress.endsWith('.sol')) {
+                const _domainOwner = await resolveDomainName(
+                    connection,
+                    recipientAddress.slice(0, -4),
+                );
+                if (!_domainOwner) {
+                    setAddressHelperText(`This domain name is not registered`);
+                    setPassValidation(undefined);
+                    return;
+                }
+                isDomainName = true;
+                domainOwner = _domainOwner;
+            }
+            if (!recipientAddress) {
                 setAddressHelperText(defaultAddressHelperText);
                 setPassValidation(undefined);
                 return;
             }
             try {
                 const destinationAccountInfo = await connection.getAccountInfo(
-                    new PublicKey(destinationAddress),
+                    new PublicKey(isDomainName ? domainOwner : recipientAddress),
                 );
 
                 if (!!destinationAccountInfo && destinationAccountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
@@ -187,6 +219,7 @@ function useForm(publicKeys, lastTxTimestamp) {
                     if (accountInfo.mint.toBase58() === mintString) {
                         setPassValidation(true);
                         setAddressHelperText('Address is a valid SPL token address');
+                        setDestinationAddress(isDomainName ? domainOwner : recipientAddress);
                     } else {
                         setPassValidation(false);
                         setAddressHelperText('Destination address mint does not match');
@@ -194,8 +227,9 @@ function useForm(publicKeys, lastTxTimestamp) {
                 } else {
                     setPassValidation(true);
                     setAddressHelperText(
-                        `Destination is a Solana address: ${destinationAddress}`,
+                        `Destination is a Solana address: ${isDomainName ? domainOwner : recipientAddress}`,
                     );
+                    setDestinationAddress(isDomainName ? domainOwner : recipientAddress);
                 }
             } catch (e) {
                 console.log(`Received error validating address ${e}`);
@@ -203,7 +237,7 @@ function useForm(publicKeys, lastTxTimestamp) {
                 setPassValidation(undefined);
             }
         })();
-    }, [destinationAddress]);
+    }, [recipientAddress]);
 
     const fields = (
         <>
@@ -225,8 +259,8 @@ function useForm(publicKeys, lastTxTimestamp) {
                 fullWidth
                 variant='outlined'
                 margin='normal'
-                value={destinationAddress}
-                onChange={(e) => setDestinationAddress(e.target.value.trim())}
+                value={recipientAddress}
+                onChange={(e) => setRecipientAddress(e.target.value.trim())}
                 helperText={addressHelperText}
                 error={!passAddressValidation && passAddressValidation !== undefined}
             />
@@ -298,7 +332,8 @@ function useForm(publicKeys, lastTxTimestamp) {
         mint: balanceInfo?.mint,
         decimals: balanceInfo?.decimals,
         tokenPublicKey: balanceInfo?.publicKey,
-        passAddressValidation
+        passAddressValidation,
+        setRecipientAddress
     };
 }
 
@@ -317,14 +352,23 @@ const Form = () => {
         mint,
         decimals,
         tokenPublicKey, // Address or Associated Token Address
-        passAddressValidation
-    } = useForm(publicKeys,lastTxTimestamp);
+        passAddressValidation,
+        setRecipientAddress
+    } = useForm(publicKeys, lastTxTimestamp);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [transactionBaseSize, setTransactionBaseSize] = useState(276);
     const [transactionSize, setTransactionSize] = useState(0);
     const [transactionFees, setTransactionFees] = useState('');
     const [count, setCount] = useState(0);
     const TRANSACTION_SIZE_MAX = 1232;
+    const location = useLocation();
+
+    useEffect(() => {
+        let address = (new URLSearchParams(location.search)).get("address");
+        if (address) {
+            setRecipientAddress(address);
+        }
+    }, [location, setRecipientAddress])
 
     const transferToken = useCallback(async (
         source,

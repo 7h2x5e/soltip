@@ -2,9 +2,9 @@ export const POLLING_INTERVAL = 10000;
 export const PRICE_POLLING_INTERVAL = 30000;
 export const ALERT_BOX_DELAY = 8000;
 export const ALERT_BOX_INTERVAL = 1000;
-export const MINIMAL_ACCEPTED_PRICE_IN_USD = 0.03; // 0 = unlimited
+export const MINIMAL_ACCEPTED_PRICE_IN_USD = 0.1; // 0 = unlimited
 export const ORACLE_MAPPING_PUBLIC_KEY = 'AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J'; // For mainnet-beta
-export const ANIME_GIF_LOCATION = './gura.gif'
+export const ANIME_GIF_LOCATION = './partyparrot.gif'
 export const ENABLE_BAD_WORDS_FILTER = true;
 
 // [ token mint address, price account key ]

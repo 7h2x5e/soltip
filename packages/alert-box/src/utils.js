@@ -8,7 +8,18 @@ import {
 } from './config.js';
 import { ASSOCIATED_TOKEN_PROGRAM_ID, POPULAR_TOKENS } from './tokens'
 import { parsePriceData } from '@pythnetwork/client'
- 
+import {
+    getTwitterRegistry,
+    getHashedName,
+    getNameAccountKey,
+    NameRegistryState,
+} from '@bonfida/spl-name-service';
+
+// Address of the SOL TLD
+export const SOL_TLD_AUTHORITY = new web3.PublicKey(
+    '58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx',
+  );
+
 export const tipBuffer = [];
 export const priceBuffer = {};
 
@@ -121,7 +132,7 @@ async function addListenerForAddress(connection, publickey, symbol, mintAddress,
                             }
                             evaluated = _i * priceBuffer[mintAddress];
                             if (MINIMAL_ACCEPTED_PRICE_IN_USD > evaluated) {
-                                console.log(`Price too low. Signature: ${senderSignature} ${(100*evaluated/MINIMAL_ACCEPTED_PRICE_IN_USD).toFixed(3)} %`);
+                                console.log(`Price too low. Signature: ${senderSignature} ${(100 * evaluated / MINIMAL_ACCEPTED_PRICE_IN_USD).toFixed(3)} %`);
                                 return;
                             }
                         }
@@ -225,3 +236,38 @@ export async function initListeners(_publickey) {
     }));
     return intervalIDs;
 }
+
+export const resolveTwitterHandle = async (twitterHandle) => {
+    const connection = new web3.Connection(
+        web3.clusterApiUrl('mainnet-beta'),
+    );
+    try {
+        const registry = await getTwitterRegistry(connection, twitterHandle);
+        return registry.owner.toBase58();
+    } catch (err) {
+        console.warn(`err`);
+        return undefined;
+    }
+};
+
+export const resolveDomainName = async (domainName) => {
+    const connection = new web3.Connection(
+        web3.clusterApiUrl('mainnet-beta'),
+    );
+    let hashedDomainName = await getHashedName(domainName);
+    let inputDomainKey = await getNameAccountKey(
+        hashedDomainName,
+        undefined,
+        SOL_TLD_AUTHORITY,
+    );
+    try {
+        const registry = await NameRegistryState.retrieve(
+            connection,
+            inputDomainKey,
+        );
+        return registry.owner.toBase58();
+    } catch (err) {
+        console.warn(err);
+        return undefined;
+    }
+};

@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "./",
   "dependencies": {
+    "@bonfida/spl-name-service": "^0.1.14",
     "@project-serum/serum": "^0.13.59",
     "@pythnetwork/client": "^2.2.0",
     "@solana/web3.js": "^1.26.0",

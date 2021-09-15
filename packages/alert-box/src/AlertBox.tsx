@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './AlertBox.css';
-import { tipBuffer, initListeners } from './utils'
+import {
+  tipBuffer,
+  initListeners,
+  resolveTwitterHandle,
+  resolveDomainName
+} from './utils'
 import {
   ALERT_BOX_DELAY,
   ALERT_BOX_INTERVAL,
@@ -12,10 +17,6 @@ import {
   useLocation
 } from "react-router-dom";
 import * as Filter from 'bad-words'
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 function AlertBox() {
   const [fadeProp, setFadeProp] = useState({
@@ -30,8 +31,8 @@ function AlertBox() {
     slot: undefined,
     priceInUSD: undefined
   })
-  const query = useQuery();
-  
+  const location = useLocation();
+
   const filter = useMemo(() => {
     let filter = new Filter();
     filter.addWords(...CUSTOM_BAD_WORDS);
@@ -40,16 +41,36 @@ function AlertBox() {
 
   useEffect(() => {
     (async () => {
-      let address = query.get("address");
+      let isDomainName = false,
+        domainOwner,
+        address = (new URLSearchParams(location.search)).get("address");
       if (!address || !filter) return;
-      if (address.length !== 44) return;
-      console.log(`Input address (public key): ${address}`);
-      await initListeners(address);
+      if (address.startsWith('@')) {
+        const twitterOwner = await resolveTwitterHandle(address.slice(1));
+        if (!twitterOwner) {
+          console.log(`This Twitter handle is not registered`);
+          return;
+        }
+        isDomainName = true;
+        domainOwner = twitterOwner;
+      }
+      if (address.endsWith('.sol')) {
+        const _domainOwner = await resolveDomainName(address.slice(0, -4));
+        if (!_domainOwner) {
+          console.log(`This domain name is not registered`);
+          return;
+        }
+        isDomainName = true;
+        domainOwner = _domainOwner;
+      }
+      if ((isDomainName ? domainOwner : address).length !== 44) return;
+      console.log(`Input address (public key): ${isDomainName ? domainOwner : address}`);
+      await initListeners(isDomainName ? domainOwner : address);
       tipBuffer.push({
-        author: 'Test',
-        message: 'BTC to themoon',
-        amount: '0.001',
-        symbol: 'TestCoin',
+        author: 'Gawr Gura',
+        message: 'BTC',
+        amount: '1',
+        symbol: 'BTC',
         senderSignature: null,
         slot: null,
         priceInUSD: 0
