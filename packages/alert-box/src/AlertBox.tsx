@@ -32,6 +32,7 @@ function AlertBox() {
     priceInUSD: undefined
   })
   const location = useLocation();
+  const [imageLocation, setImageLocation] = useState(ANIME_GIF_LOCATION);
 
   const filter = useMemo(() => {
     let filter = new Filter();
@@ -43,7 +44,9 @@ function AlertBox() {
     (async () => {
       let isDomainName = false,
         domainOwner,
-        address = (new URLSearchParams(location.search)).get("address");
+        address = (new URLSearchParams(location.search)).get("address"),
+        imageLocation = (new URLSearchParams(location.search)).get("imgurl");
+      if (imageLocation) setImageLocation(imageLocation);
       if (!address || !filter) return;
       if (address.startsWith('@')) {
         const twitterOwner = await resolveTwitterHandle(address.slice(1));
@@ -121,7 +124,7 @@ function AlertBox() {
     <div id="box">
       <div id="wrap" className={fadeProp.fade}>
         <div id="image-wrap">
-          <div id="image" style={{ backgroundImage: `url(${ANIME_GIF_LOCATION})` }}>
+          <div id="image" style={{ backgroundImage: `url(${imageLocation})` }}>
           </div>
         </div>
         <div id="text-wrap">

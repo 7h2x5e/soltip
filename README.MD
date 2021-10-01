@@ -29,8 +29,15 @@ https://soltip.tw/alertbox/?address=gura.sol
 ```
 Or
 ```
-https://soltip.tw/alertbox/?address=ARJC7RU7vYcgZ2HPA2dANyD4pcNzQmMaLFKYSKnsAZ6B
+https://soltip.tw/alertbox/?address=ARJC7RU7vYcgZ2HPA2dANyD4pcNzQmMaLFKYSKnsAZ6B&imgurl=https://i.imgur.com/tsvPcg8.gif
 ```
+
+### Query Parameters
+Name|Required|Description
+-|-|-
+address|O|Address of receiver. Can be SOL address or domain name.
+imgurl||Url of image.
+
 
 2. Tipping someone. Open 
 ```
