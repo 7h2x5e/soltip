@@ -28,7 +28,7 @@ Solana's first tipping app, SolTip, is a frontend only tipping solution with rea
 https://soltip.tw/alertbox/?address=gura.sol
 ```
 Or
-```
+```!
 https://soltip.tw/alertbox/?address=ARJC7RU7vYcgZ2HPA2dANyD4pcNzQmMaLFKYSKnsAZ6B&imgurl=https://i.imgur.com/tsvPcg8.gif
 ```
 
@@ -37,7 +37,7 @@ Name|Required|Description
 -|-|-
 address|O|Address of receiver. Can be SOL address or domain name.
 imgurl||Url of image.
-
+soundurl||Url of alert sound.
 
 2. Tipping someone. Open 
 ```

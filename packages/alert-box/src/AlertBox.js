@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import './AlertBox.css';
 import {
   tipBuffer,
@@ -33,6 +33,7 @@ function AlertBox() {
   })
   const location = useLocation();
   const [imageLocation, setImageLocation] = useState(ANIME_GIF_LOCATION);
+  const [soundLocation, setSoundLocation] = useState("./streamlabs_default.ogg");
 
   const filter = useMemo(() => {
     let filter = new Filter();
@@ -45,8 +46,10 @@ function AlertBox() {
       let isDomainName = false,
         domainOwner,
         address = (new URLSearchParams(location.search)).get("address"),
-        imageLocation = (new URLSearchParams(location.search)).get("imgurl");
-      if (imageLocation) setImageLocation(imageLocation);
+        imageLocation = (new URLSearchParams(location.search)).get("imgurl"),
+        soundLocation = (new URLSearchParams(location.search)).get("soundurl");
+      if (!!imageLocation) setImageLocation(imageLocation);
+      if (!!soundLocation) setSoundLocation(soundLocation);
       if (!address || !filter) return;
       if (address.startsWith('@')) {
         const twitterOwner = await resolveTwitterHandle(address.slice(1));
@@ -70,10 +73,10 @@ function AlertBox() {
       console.log(`Input address (public key): ${isDomainName ? domainOwner : address}`);
       await initListeners(isDomainName ? domainOwner : address);
       tipBuffer.push({
-        author: 'Gawr Gura',
-        message: 'BTC',
+        author: 'Test',
+        message: 'Message',
         amount: '1',
-        symbol: 'BTC',
+        symbol: 'Token',
         senderSignature: null,
         slot: null,
         priceInUSD: 0
@@ -104,6 +107,18 @@ function AlertBox() {
           tip = _tip;
         }
       }
+      switch (tip.symbol) {
+        case "SOL":
+          tip.amount = tip.amount.substr(0, tip.amount.length - 5);
+          break;
+        case "USDC":
+          tip.amount = tip.amount.substr(0, tip.amount.length - 4);
+          break;
+        case "RAY":
+          tip.amount = tip.amount.substr(0, tip.amount.length - 4);
+          break;
+        default:
+      }
       setTipMessage({
         ...tip
       });
@@ -121,25 +136,30 @@ function AlertBox() {
   }, [])
 
   return (
-    <div id="box">
-      <div id="wrap" className={fadeProp.fade}>
-        <div id="image-wrap">
-          <div id="image" style={{ backgroundImage: `url(${imageLocation})` }}>
-          </div>
-        </div>
-        <div id="text-wrap">
-          <div id="text">
-            <div id="message">
-              {`${tipMessage.author || 'Someone'} just tipped ${tipMessage.amount} ${tipMessage.symbol} `}
-              {!tipMessage.priceInUSD ? '' : `($${Number(tipMessage.priceInUSD).toFixed(2)})`}
+    <>
+      <div id="box">
+        <div id="wrap" className={fadeProp.fade}>
+          <div id="image-wrap">
+            <div id="image" style={{ backgroundImage: `url(${imageLocation})` }}>
             </div>
-            <div id="user-message">
-              {`${tipMessage.message || ''}`}
+          </div>
+          <div id="text-wrap">
+            <div id="text">
+              <div id="message">
+                {`${tipMessage.author || 'Someone'} just tipped ${tipMessage.amount} ${tipMessage.symbol} `}
+                {!tipMessage.priceInUSD ? '' : `($${Number(tipMessage.priceInUSD).toFixed(2)})`}
+              </div>
+              <div id="user-message">
+                {`${tipMessage.message || ''}`}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      {
+        fadeProp.fade == 'fade-in' ? <iframe src={soundLocation} allow="autoplay" style={{ visibility: "hidden" }} /> : ""
+      }
+    </>
   );
 }
 
