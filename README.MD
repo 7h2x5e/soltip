@@ -1,5 +1,9 @@
 <h1 align="center">Soltip</h1>
 
+<p align="center">
+  <img width="150" src="./logo.png" alt="Soltip logo">
+</p>
+
 <div align="center">
 A tipping DApp for Solana and OBS Studio users.
 </div>
